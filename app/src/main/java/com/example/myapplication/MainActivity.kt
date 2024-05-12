@@ -1,9 +1,15 @@
 package com.example.myapplication
 
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.ConstantUtil.Companion.TAG
 import com.example.myapplication.databinding.ActivityMainBinding
@@ -16,9 +22,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this)[MainViewModel::class.java]
-    }
+    private val viewModel: MainViewModel by viewModels()
+    private var count = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,9 +31,18 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initViewModel()
+        // 노티피케이션 권한 for 13버전
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this,
+                    android.Manifest.permission.POST_NOTIFICATIONS) !=
+                PackageManager.PERMISSION_GRANTED) {
 
-        Firebase.messaging.subscribeToTopic("weather")
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
+            }
+        }
+
+
+        Firebase.messaging.subscribeToTopic("glucose")
             .addOnCompleteListener { task ->
                 var msg = "Subscribed"
                 if (!task.isSuccessful) {
@@ -43,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
-
+            
             // Get new FCM registration token
             val token = task.result
 
@@ -52,11 +66,14 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
         })
 
-    }
-
-    private fun initViewModel() = with(viewModel) {
-        fcmMsg.observe(this@MainActivity) {
-            binding.tvReceivedMsg.text = it
-        }
+        // 텍스트뷰 변경 코드
+        MyFirebaseMessagingService.Events.serviceEvent.observe(
+            this,
+            Observer<Map<String, String>>
+            { fcmMsg ->
+                count++
+                binding.tvReceivedMsg.text = "count : ${count} \n" + "$fcmMsg"
+            }
+        )
     }
 }

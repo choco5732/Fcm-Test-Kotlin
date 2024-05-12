@@ -1,66 +1,109 @@
 package com.example.myapplication
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
+import android.graphics.Color
 import android.media.RingtoneManager
 import android.os.Build
+import android.preference.PreferenceManager
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.MutableLiveData
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.myapplication.ConstantUtil.Companion.TAG
+import com.example.myapplication.ConstantUtil.Companion.gluconseChannelName
+import com.example.myapplication.ConstantUtil.Companion.glucoseChannelId
+import com.example.myapplication.ConstantUtil.Companion.glucoseNotificationId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
-//    private val viewModel: MainViewModel by lazy {
-//        ViewModelProvider()[MainViewModel::class.java]
-//    }
+    object Events {
+        val serviceEvent: MutableLiveData<Map<String, String>> by lazy {
+            MutableLiveData<Map<String, String>>()
+        }
+    }
+
+//    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+//    var count = sharedPreferences.getInt("notification_count", 0)
+    val channel: NotificationChannel? = null
+    var count: Int = 0
+    val sharedPreferences : SharedPreferences? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        var count = sharedPreferences.getInt("notification_count", 0)
+    }
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // TODO(developer): Handle FCM messages here.
-        // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d(TAG, "From: ${remoteMessage.from}")
-
-//        viewModel.setFcmMsg(remoteMessage.data)
-
-
-
-
-
-        // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
+            Events.serviceEvent.postValue(remoteMessage.data)
             Log.d(TAG, "Message data payload: ${remoteMessage.data}")
 
-            // Check if data needs to be processed by long running job
-            if (needsToBeScheduled()) {
-                // For long-running tasks (10 seconds or more) use WorkManager.
-                scheduleJob()
-            } else {
-                // Handle message within 10 seconds
-                handleNow()
+
+            if (remoteMessage.data.containsValue("notification") &&
+                remoteMessage.data.containsValue("glucose") && count < 8
+            ) {
+                Log.d(TAG, "glucose dataMsg 수신됨!")
+
+                // sharedPreference count 증가값 저장
+                count++
+                val editor = sharedPreferences?.edit()
+                editor?.putInt("notification_count", count)
+                editor?.apply()
+
+                // 빌더 .. 노티 아이콘, 제목, 내용 등등
+                val builder = NotificationCompat.Builder(applicationContext, glucoseChannelId)
+                builder.setSmallIcon(R.drawable.ic_glucose_notification)
+                builder.setContentTitle("AGMS 혈당 입력 시간 입니다.")
+                builder.setContentText("앱을 실행 하여 혈당 값을 입력해 주세요")
+                builder.setAutoCancel(true)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+                // 인텐트
+                val intent = Intent(applicationContext, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
+                // 펜딩 인텐트
+                val pendingIntent = PendingIntent.getActivity(
+                    applicationContext, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+                builder.setContentIntent(pendingIntent)
+                val notificationManager =
+                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+                // 버전 구분
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    var notificationChannel =
+                        notificationManager.getNotificationChannel(glucoseChannelId)
+                    if (notificationChannel == null) {
+                        val importance = NotificationManager.IMPORTANCE_HIGH
+                        notificationChannel = NotificationChannel(glucoseChannelId, gluconseChannelName, importance)
+                        notificationChannel.description
+                        notificationChannel.enableVibration(true)
+                        notificationManager.createNotificationChannel(notificationChannel)
+                    }
+                }
+                notificationManager.notify(glucoseNotificationId, builder.build())
+
             }
-        }
 
-        // Check if message contains a notification payload.
-        remoteMessage.notification?.let {
-            Log.d(TAG, "Message Notification Body: ${it.body}")
-        }
 
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
+        }
     }
-    // [END receive_message]
 
-    private fun needsToBeScheduled() = true
 
-    // [START on_new_token]
     /**
      * Called if the FCM registration token is updated. This may occur if the security of
      * the previous token had been compromised. Note that this is called when the
@@ -116,7 +159,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setSound(defaultSoundUri)
             .setContentIntent(pendingIntent)
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Since android Oreo notification channel is needed.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -133,7 +177,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
 
-    internal class MyWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
+    internal class MyWorker(appContext: Context, workerParams: WorkerParameters) :
+        Worker(appContext, workerParams) {
         override fun doWork(): Result {
             // TODO(developer): add long running task here.
             return Result.success()
