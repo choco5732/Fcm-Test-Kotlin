@@ -44,11 +44,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             Log.d(TAG, "Message data payload: ${remoteMessage.data}")
 
             // sharedPreference 불러오기
-            val pref = getSharedPreferences("pref2", 0)
+            val pref = getSharedPreferences("pref8", 0)
             var count = pref.getInt("glucoseCount", 0)
 
+
+            // count 값으로 몇 번 울릴지 설정 예) 10시~ 12시 30분간격이면 하루 5번, 3일 15번
             if (remoteMessage.data.containsValue("notification") &&
-                remoteMessage.data.containsValue("glucose") && count < 3
+                remoteMessage.data.containsValue("glucose") && count < 3 // 이 값으로 노티 몇번 띄울지 설정
             ) {
                 Log.d(TAG, "glucose dataMsg 수신됨!")
 
