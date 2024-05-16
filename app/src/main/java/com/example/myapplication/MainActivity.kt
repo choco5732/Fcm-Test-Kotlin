@@ -23,7 +23,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel: MainViewModel by viewModels()
-    private var count = 0
+//    private var count = 0
+
+    companion object {
+        var notiCount: Int? = null
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +44,9 @@ class MainActivity : AppCompatActivity() {
                 ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
             }
         }
+
+        // sharedPreference 불러오기
+        val pref = getSharedPreferences("pref2", 0)
 
 
         Firebase.messaging.subscribeToTopic("glucose")
@@ -71,8 +78,8 @@ class MainActivity : AppCompatActivity() {
             this,
             Observer<Map<String, String>>
             { fcmMsg ->
-                count++
-                binding.tvReceivedMsg.text = "count : ${count} \n" + "$fcmMsg"
+//                count++
+                binding.tvReceivedMsg.text = "count : ${pref.getInt("glucoseCount", 0)} \n" + "$fcmMsg"
             }
         )
     }

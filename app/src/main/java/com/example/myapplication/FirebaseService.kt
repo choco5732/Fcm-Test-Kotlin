@@ -34,34 +34,30 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
-//    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-//    var count = sharedPreferences.getInt("notification_count", 0)
     val channel: NotificationChannel? = null
-    var count: Int = 0
-    val sharedPreferences : SharedPreferences? = null
+//    var count: Int = 0
 
-    override fun onCreate() {
-        super.onCreate()
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        var count = sharedPreferences.getInt("notification_count", 0)
-    }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         if (remoteMessage.data.isNotEmpty()) {
             Events.serviceEvent.postValue(remoteMessage.data)
             Log.d(TAG, "Message data payload: ${remoteMessage.data}")
 
+            // sharedPreference 불러오기
+            val pref = getSharedPreferences("pref2", 0)
+            var count = pref.getInt("glucoseCount", 0)
 
             if (remoteMessage.data.containsValue("notification") &&
-                remoteMessage.data.containsValue("glucose") && count < 8
+                remoteMessage.data.containsValue("glucose") && count < 3
             ) {
                 Log.d(TAG, "glucose dataMsg 수신됨!")
 
                 // sharedPreference count 증가값 저장
                 count++
-                val editor = sharedPreferences?.edit()
-                editor?.putInt("notification_count", count)
-                editor?.apply()
+
+                val edit = pref.edit()
+                edit.putInt("glucoseCount", count)
+                edit.apply()
 
                 // 빌더 .. 노티 아이콘, 제목, 내용 등등
                 val builder = NotificationCompat.Builder(applicationContext, glucoseChannelId)
