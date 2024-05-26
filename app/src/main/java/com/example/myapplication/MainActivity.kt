@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
         })
 
-        // 텍스트뷰 변경 코드
+        // TextViw count 갱신 코드
         MyFirebaseMessagingService.Events.serviceEvent.observe(
             this,
             Observer<Map<String, String>>
@@ -92,29 +92,6 @@ class MainActivity : AppCompatActivity() {
                     Log.e("choco5732", "실패 : $p1")
                 }
             })
-
-//            postgre.testApiMethod().enqueue(object: retrofit2.Callback<String>{
-//                override fun onResponse(p0: Call<String>, p1: retrofit2.Response<String>) {
-//                    Log.d("choco5732", "성공 : " + p1.body().toString())
-//                }
-//
-//                override fun onFailure(p0: Call<String>, p1: Throwable) {
-//                    Log.e("choco5732", "실패 : $p1")
-//                }
-//
-//            }
-            // list 불러오기 성공
-//            postgre.list().enqueue(object: retrofit2.Callback<List<FcmPatient>>{
-//                override fun onResponse(p0: Call<List<FcmPatient>>, p1: retrofit2.Response<List<FcmPatient>>) {
-//                    Log.d("choco5732", "성공 : " + p1.body().toString())
-//                }
-//
-//                override fun onFailure(p0: Call<List<FcmPatient>>, p1: Throwable) {
-//                    Log.e("choco5732", "실패 : $p1")
-//                }
-//
-//            })
-
         }
     }
 
@@ -122,19 +99,16 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         val cal = Calendar.getInstance()
         val time = cal.time
-        val year = time.year
-        val month = time.month
-        val day = time.day
 
         Log.d(TAG, "$time")
 
         postgre.updateStartTime(1).enqueue(object: retrofit2.Callback<FcmPatient> {
             override fun onResponse(p0: Call<FcmPatient>, p1: retrofit2.Response<FcmPatient>) {
-                Log.d("choco5732", "성공 : " + p1.body().toString())
+                Log.d("choco5732", "시작시간 업데이트 성공 : " + p1.body().toString())
             }
 
             override fun onFailure(p0: Call<FcmPatient>, p1: Throwable) {
-                Log.e("choco5732", "실패 : $p1")
+                Log.e("choco5732", "시작시간 업데이트 실패 : $p1")
             }
         })
 

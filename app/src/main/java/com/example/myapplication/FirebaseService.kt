@@ -34,7 +34,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     val channel: NotificationChannel? = null
 //    var count: Int = 0
 
-
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         if (remoteMessage.data.isNotEmpty()) {
             Events.serviceEvent.postValue(remoteMessage.data)
