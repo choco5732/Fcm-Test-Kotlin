@@ -16,6 +16,9 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.myapplication.ConstantUtil.Companion.TAG
+import com.example.myapplication.ConstantUtil.Companion.endChannelId
+import com.example.myapplication.ConstantUtil.Companion.endChannelName
+import com.example.myapplication.ConstantUtil.Companion.endNotificationId
 import com.example.myapplication.ConstantUtil.Companion.gluconseChannelName
 import com.example.myapplication.ConstantUtil.Companion.glucoseChannelId
 import com.example.myapplication.ConstantUtil.Companion.glucoseNotificationId
@@ -92,6 +95,50 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     }
                 }
                 notificationManager.notify(glucoseNotificationId, builder.build())
+
+            }
+
+            // 종료 노티
+            if (remoteMessage.data.containsValue("notification") &&
+                remoteMessage.data.containsValue("end")
+//                && count < 3 // 이 값으로 노티 몇번 띄울지 설정
+            ) {
+                Log.d(TAG, "end dataMsg 수신됨!")
+
+
+                // 빌더 .. 노티 아이콘, 제목, 내용 등등
+                val builder = NotificationCompat.Builder(applicationContext, endChannelId)
+                builder.setSmallIcon(R.drawable.ic_glucose_notification)
+                builder.setContentTitle("AGMS 센서 측정이 완료되었어요.")
+                builder.setContentText("앱을 실행하여 측정을 종료해 주세요")
+                builder.setAutoCancel(true)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+                // 인텐트
+                val intent = Intent(applicationContext, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
+                // 펜딩 인텐트
+                val pendingIntent = PendingIntent.getActivity(
+                    applicationContext, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+                builder.setContentIntent(pendingIntent)
+                val notificationManager =
+                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+                // 버전 구분
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    var notificationChannel =
+                        notificationManager.getNotificationChannel(endChannelId)
+                    if (notificationChannel == null) {
+                        val importance = NotificationManager.IMPORTANCE_HIGH
+                        notificationChannel = NotificationChannel(endChannelId, endChannelName, importance)
+                        notificationChannel.description
+                        notificationChannel.enableVibration(true)
+                        notificationManager.createNotificationChannel(notificationChannel)
+                    }
+                }
+                notificationManager.notify(endNotificationId, builder.build())
 
             }
 

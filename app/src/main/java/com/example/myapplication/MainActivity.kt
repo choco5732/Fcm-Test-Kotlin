@@ -18,6 +18,9 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.ktx.messaging
 import retrofit2.Call
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.net.SocketException
 import java.util.Calendar
 
 
@@ -27,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private var count = 0
+
 
 
 
@@ -45,6 +49,7 @@ class MainActivity : AppCompatActivity() {
                 ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
             }
         }
+
 
         // 혈당 구독.. 성공시 토스트 메시지
         Firebase.messaging.subscribeToTopic("glucose")
@@ -94,6 +99,16 @@ class MainActivity : AppCompatActivity() {
                     Log.e("choco5732", "실패 : $p1")
                 }
             })
+            // select All
+//            postgre.list().enqueue(object : retrofit2.Callback<List<FcmPatient>> {
+//                override fun onResponse(p0: Call<List<FcmPatient>>, p1: retrofit2.Response<List<FcmPatient>>) {
+//                    Log.d("choco5732", "버튼 눌러서 리스트 보기 성공 : " + p1.body().toString())
+//                }
+//
+//                override fun onFailure(p0: Call<List<FcmPatient>>, p1: Throwable) {
+//                    Log.e("choco5732", "실패 : $p1")
+//                }
+//            })
         }
     }
 
