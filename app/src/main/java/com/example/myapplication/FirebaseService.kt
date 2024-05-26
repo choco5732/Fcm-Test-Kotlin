@@ -8,6 +8,7 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.work.OneTimeWorkRequest
@@ -126,7 +127,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     private fun sendRegistrationToServer(token: String?) {
         postgre.updateFcmToken(1, token.toString()).enqueue(object : retrofit2.Callback<FcmPatient> {
             override fun onResponse(p0: Call<FcmPatient>, p1: retrofit2.Response<FcmPatient>) {
-                Log.d("choco5732", "토큰 갱신(등록) 성공 : " + p1.body().toString())
+                Log.d("choco5732", "토큰 갱신(등록) 성공 : $token" )
+                Toast.makeText(applicationContext, "토큰 갱신(등록) 성공\n$token", Toast.LENGTH_SHORT).show()
             }
 
             override fun onFailure(p0: Call<FcmPatient>, p1: Throwable) {

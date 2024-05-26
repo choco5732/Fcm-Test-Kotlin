@@ -46,18 +46,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
+        // 혈당 구독.. 성공시 토스트 메시지
         Firebase.messaging.subscribeToTopic("glucose")
             .addOnCompleteListener { task ->
-                var msg = "Subscribed"
+                var msg = "혈당 노티 구독 성공!"
                 if (!task.isSuccessful) {
-                    msg = "Subscribe failed"
+                    msg = "혈당 노티 구독 실패.."
                 }
                 Log.d(TAG, msg)
                 Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
 
             }
 
+        // 토큰 불러오기.. 성공시 토스트 메시지(토큰)
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
@@ -69,7 +70,7 @@ class MainActivity : AppCompatActivity() {
 
             // Log and toast
             Log.d(TAG, token)
-            Toast.makeText(baseContext, token, Toast.LENGTH_SHORT).show()
+            Toast.makeText(baseContext, "토큰 : $token", Toast.LENGTH_SHORT).show()
         })
 
         // TextViw count 갱신 코드
@@ -82,6 +83,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
+        // db 업데이트 테스트
         binding.btnTokenUpdate.setOnClickListener {
             postgre.updateFcmToken(1, "I'm not Android.").enqueue(object : retrofit2.Callback<FcmPatient> {
                 override fun onResponse(p0: Call<FcmPatient>, p1: retrofit2.Response<FcmPatient>) {
@@ -104,11 +106,11 @@ class MainActivity : AppCompatActivity() {
 
         postgre.updateStartTime(1).enqueue(object: retrofit2.Callback<FcmPatient> {
             override fun onResponse(p0: Call<FcmPatient>, p1: retrofit2.Response<FcmPatient>) {
-                Log.d("choco5732", "시작시간 업데이트 성공 : " + p1.body().toString())
+                Log.d("choco5732", "시작 시간 업데이트 성공")
             }
 
             override fun onFailure(p0: Call<FcmPatient>, p1: Throwable) {
-                Log.e("choco5732", "시작시간 업데이트 실패 : $p1")
+                Log.e("choco5732", "시작 시간 업데이트 실패 : $p1")
             }
         })
 
