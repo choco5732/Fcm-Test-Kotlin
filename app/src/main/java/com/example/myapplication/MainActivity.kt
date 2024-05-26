@@ -13,19 +13,12 @@ import androidx.lifecycle.Observer
 import com.example.myapplication.ConstantUtil.Companion.TAG
 import com.example.myapplication.RetrofitClient.postgre
 import com.example.myapplication.databinding.ActivityMainBinding
-import com.google.android.gms.common.api.Response
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.ktx.messaging
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import okhttp3.ResponseBody
 import retrofit2.Call
-import java.io.IOException
 import java.util.Calendar
-import javax.security.auth.callback.Callback
 
 
 class MainActivity : AppCompatActivity() {
@@ -90,9 +83,9 @@ class MainActivity : AppCompatActivity() {
         )
 
         binding.btnTokenUpdate.setOnClickListener {
-            postgre.updateFcmToken2(1, "I'm not Andorid.").enqueue(object : retrofit2.Callback<FcmPatient> {
+            postgre.updateFcmToken(1, "I'm not Android.").enqueue(object : retrofit2.Callback<FcmPatient> {
                 override fun onResponse(p0: Call<FcmPatient>, p1: retrofit2.Response<FcmPatient>) {
-                    Log.d("choco5732", "성공 : " + p1.body().toString())
+                    Log.d("choco5732", "버튼 눌러서 전송 성공 : " + p1.body().toString())
                 }
 
                 override fun onFailure(p0: Call<FcmPatient>, p1: Throwable) {
