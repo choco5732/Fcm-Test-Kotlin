@@ -21,4 +21,7 @@ interface PostgreRemoteDataSource {
 //    fun updateFcmToken2(@Query("id")id: Long, @Query("newFcmToken")newFcmToken: String): Call<FcmPatient>
     @PUT("/patients/fcmToken")
     fun updateFcmToken2(@Query("id")id: Long, @Query("newFcmToken")newFcmToken: String): Call<FcmPatient>
+
+    @PUT("/startTime")
+    fun updateStartTime(@Query("id")id: Long): Call<FcmPatient>
 }

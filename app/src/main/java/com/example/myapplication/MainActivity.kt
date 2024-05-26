@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import retrofit2.Call
 import java.io.IOException
+import java.util.Calendar
 import javax.security.auth.callback.Callback
 
 
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private var count = 0
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,5 +123,27 @@ class MainActivity : AppCompatActivity() {
 //            })
 
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val cal = Calendar.getInstance()
+        val time = cal.time
+        val year = time.year
+        val month = time.month
+        val day = time.day
+
+        Log.d(TAG, "$time")
+
+        postgre.updateStartTime(1).enqueue(object: retrofit2.Callback<FcmPatient> {
+            override fun onResponse(p0: Call<FcmPatient>, p1: retrofit2.Response<FcmPatient>) {
+                Log.d("choco5732", "성공 : " + p1.body().toString())
+            }
+
+            override fun onFailure(p0: Call<FcmPatient>, p1: Throwable) {
+                Log.e("choco5732", "실패 : $p1")
+            }
+        })
+
     }
 }
