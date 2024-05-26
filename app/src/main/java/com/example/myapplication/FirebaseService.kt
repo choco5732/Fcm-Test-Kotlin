@@ -23,8 +23,10 @@ import com.example.myapplication.ConstantUtil.Companion.TAG
 import com.example.myapplication.ConstantUtil.Companion.gluconseChannelName
 import com.example.myapplication.ConstantUtil.Companion.glucoseChannelId
 import com.example.myapplication.ConstantUtil.Companion.glucoseNotificationId
+import com.example.myapplication.RetrofitClient.postgre
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import retrofit2.Call
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -48,9 +50,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             var count = pref.getInt("glucoseCount", 0)
 
 
-            // count 값으로 몇 번 울릴지 설정 예) 10시~ 12시 30분간격이면 하루 5번, 3일 15번
+            // count 값으로 몇 번 울릴지 설정 예) 10시~ 12시 30분 간격이면 하루 5번, 3일 15번
             if (remoteMessage.data.containsValue("notification") &&
-                remoteMessage.data.containsValue("glucose") && count < 3 // 이 값으로 노티 몇번 띄울지 설정
+                remoteMessage.data.containsValue("glucose")
+//                && count < 3 // 이 값으로 노티 몇번 띄울지 설정
             ) {
                 Log.d(TAG, "glucose dataMsg 수신됨!")
 
@@ -108,14 +111,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      * FCM registration token is initially generated so this is where you would retrieve the token.
      */
     override fun onNewToken(token: String) {
-        Log.d(TAG, "Refreshed token: $token")
-
-        // If you want to send messages to this application instance or
-        // manage this apps subscriptions on the server side, send the
-        // FCM registration token to your app server.
+        Log.d(TAG, "새로운 토큰 발행: $token")
         sendRegistrationToServer(token)
     }
-    // [END on_new_token]
 
     private fun scheduleJob() {
         // [START dispatch_job]
@@ -132,8 +130,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendRegistrationToServer(token: String?) {
-        // TODO: Implement this method to send token to your app server.
-        Log.d(TAG, "sendRegistrationTokenToServer($token)")
+        postgre.updateFcmToken2(1, token.toString()).enqueue(object : retrofit2.Callback<FcmPatient> {
+            override fun onResponse(p0: Call<FcmPatient>, p1: retrofit2.Response<FcmPatient>) {
+                Log.d("choco5732", "성공 : " + p1.body().toString())
+            }
+
+            override fun onFailure(p0: Call<FcmPatient>, p1: Throwable) {
+                Log.e("choco5732", "실패 : $p1")
+            }
+        })
+
     }
 
     private fun sendNotification(messageBody: String) {

@@ -10,13 +10,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.ConstantUtil.Companion.TAG
+import com.example.myapplication.RetrofitClient.postgre
 import com.example.myapplication.databinding.ActivityMainBinding
+import com.google.android.gms.common.api.Response
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.ktx.messaging
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import okhttp3.ResponseBody
+import retrofit2.Call
+import java.io.IOException
+import javax.security.auth.callback.Callback
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,6 +60,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 Log.d(TAG, msg)
                 Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+
             }
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -76,5 +86,40 @@ class MainActivity : AppCompatActivity() {
                 binding.tvReceivedMsg.text = "count : $count \n$fcmMsg"
             }
         )
+
+        binding.btnTokenUpdate.setOnClickListener {
+            postgre.updateFcmToken2(1, "I'm not Andorid.").enqueue(object : retrofit2.Callback<FcmPatient> {
+                override fun onResponse(p0: Call<FcmPatient>, p1: retrofit2.Response<FcmPatient>) {
+                    Log.d("choco5732", "성공 : " + p1.body().toString())
+                }
+
+                override fun onFailure(p0: Call<FcmPatient>, p1: Throwable) {
+                    Log.e("choco5732", "실패 : $p1")
+                }
+            })
+
+//            postgre.testApiMethod().enqueue(object: retrofit2.Callback<String>{
+//                override fun onResponse(p0: Call<String>, p1: retrofit2.Response<String>) {
+//                    Log.d("choco5732", "성공 : " + p1.body().toString())
+//                }
+//
+//                override fun onFailure(p0: Call<String>, p1: Throwable) {
+//                    Log.e("choco5732", "실패 : $p1")
+//                }
+//
+//            }
+            // list 불러오기 성공
+//            postgre.list().enqueue(object: retrofit2.Callback<List<FcmPatient>>{
+//                override fun onResponse(p0: Call<List<FcmPatient>>, p1: retrofit2.Response<List<FcmPatient>>) {
+//                    Log.d("choco5732", "성공 : " + p1.body().toString())
+//                }
+//
+//                override fun onFailure(p0: Call<List<FcmPatient>>, p1: Throwable) {
+//                    Log.e("choco5732", "실패 : $p1")
+//                }
+//
+//            })
+
+        }
     }
 }
