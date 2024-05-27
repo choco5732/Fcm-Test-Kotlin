@@ -44,14 +44,14 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             Log.d(TAG, "Message data payload: ${remoteMessage.data}")
 
             // sharedPreference 불러오기
-            val pref = getSharedPreferences("pref8", 0)
+            val pref = getSharedPreferences("pref18", 0)
             var count = pref.getInt("glucoseCount", 0)
 
 
             // count 값으로 몇 번 울릴지 설정 예) 10시~ 12시 30분 간격이면 하루 5번, 3일 15번
             if (remoteMessage.data.containsValue("notification") &&
                 remoteMessage.data.containsValue("glucose")
-//                && count < 3 // 이 값으로 노티 몇번 띄울지 설정
+                && count < 3 // 이 값으로 노티 몇번 띄울지 설정
             ) {
                 Log.d(TAG, "glucose dataMsg 수신됨!")
 
@@ -182,7 +182,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 Log.e("choco5732", "토큰 갱신(등록) 실패 : $p1")
             }
         })
-
+//
+//        postgre.updateFcmToken(1, "I'm not Android.").enqueue(object : retrofit2.Callback<FcmPatient> {
+//            override fun onResponse(p0: Call<FcmPatient>, p1: retrofit2.Response<FcmPatient>) {
+//                Log.d("choco5732", "버튼 눌러서 전송 성공 : " + p1.body().toString())
+//            }
+//
+//            override fun onFailure(p0: Call<FcmPatient>, p1: Throwable) {
+//                Log.e("choco5732", "실패 : $p1")
+//            }
+//        })
     }
 
     private fun sendNotification(messageBody: String) {

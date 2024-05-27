@@ -46,10 +46,29 @@
 
     <Button
         android:id="@+id/btn_token_update"
-        android:text="연결!"
+        android:text="db update 테스트"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_receivedMsg"/>
+
+    <Button
+        android:id="@+id/btn_show_dialog"
+        android:text="종료 다이얼로그"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_token_update"/>
+
+    <Button
+        android:id="@+id/btn_isEnd_false"
+        android:text="isEnd값  false로 초기화"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_show_dialog"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

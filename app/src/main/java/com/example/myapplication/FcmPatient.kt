@@ -13,4 +13,6 @@ data class FcmPatient(
     val fcm_token: String? = null,
     @SerializedName("id")
     val id: Int? = null,
+    @SerializedName("isend")
+    val isEnd: Boolean? = null
 )

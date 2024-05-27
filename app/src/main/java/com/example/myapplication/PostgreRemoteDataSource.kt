@@ -22,4 +22,10 @@ interface PostgreRemoteDataSource {
 
     @PUT("/startTime")
     fun updateStartTime(@Query("id")id: Long): Call<FcmPatient>
+
+    @PUT("/isEnd")
+    fun updateIsEnd(@Query("id")id: Long, @Query("isEnd")isEnd: Boolean): Call<FcmPatient>
+
+    @PUT("/isEndFalse")
+    fun updateIsEndFalse(@Query("id")id: Long): Call<FcmPatient>
 }

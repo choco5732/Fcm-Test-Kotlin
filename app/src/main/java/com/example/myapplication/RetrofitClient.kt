@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit
 object RetrofitClient {
 
     private const val BASE_URL = BuildConfig.HOST + BuildConfig.PORT
-//    private const val BASE_URL = "http://192.168.0.15:8080"
+//    private const val BASE_URL = "http://192.168.0.15:8080" // 집
+//    private const val BASE_URL = "http://192.168.0.138:8080" // 회사
 
     private val okHttpClient by lazy {
         OkHttpClient.Builder()
